@@ -55,8 +55,8 @@
 		Command="MSTest.exe /testcontainer:$(_testAssembly) /testsettings:$(_testSettings) /category:$(_testFilter) /resultsfile:$(_testResult)"
 		ContinueOnError="false" />
 	</Target>
-
 	<Target Name="DeclareXunitTests">
+    <!--Get list of tests to be run based on files changed from a specified PullRequestNumber. Mapping between paths and test DLLs is used to produce the list.-->
     <SmartTestingTask  RepositoryOwner="Azure" RepositoryName="azure-powershell" PullRequestNumber="$(PullRequestNumber)" MapFilePath=".\map.json">
       <Output TaskParameter ="TestAssemblies" ItemName="XUnitTests"/>
     </SmartTestingTask>
