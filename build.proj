@@ -61,6 +61,7 @@
                             Condition=" '$(Scope)' == 'AzureStorage' "/>
     <SetupSln Include=".\setup\azurepowershell.sln" />
     <StaticAnalysis Include=".\tools\StaticAnalysis\StaticAnalysis.sln" />
+    <LocalBuildTasks Include="$(LibraryToolsFolder)\BuildPackagesTask\Microsoft.Azure.Build.Tasks.sln" />
   </ItemGroup>
 
   <!-- Tasks -->
@@ -168,7 +169,8 @@
     <!-- Restore packages for static analysis-->
     <Exec Command="$(NuGetCommand) restore %(StaticAnalysis.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
           ContinueOnError="false" />
-		  
+		<Exec Command="$(NuGetCommand) restore %(LocalBuildTasks.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
+          ContinueOnError="false" />
 	<Exec Command="$(NuGetCommand) restore %(SetupSln.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
           ContinueOnError="false" />
 
