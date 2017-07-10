@@ -99,7 +99,7 @@
 			DiagnosticMessages="false"
 			ContinueOnError="false" 
 			Condition=" @(XUnitTests) != '' "/>
-		
+	
 		<CallTarget Targets="TestSetup" />
 	</Target>
 
