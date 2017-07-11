@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Azure.Build.Tasks.Properties;
 using System.Collections.Generic;
 using TestMapper;
+using System;
 
 namespace SmartTesterTask
 {
@@ -62,6 +63,28 @@ namespace SmartTesterTask
         /// <returns> Returns a value indicating wheter the success status of the task. </returns>
         public override bool Execute()
         {
+
+           // validate parameters
+           if(RepositoryOwner == null)
+            {
+                throw new ArgumentNullException("The RepositoryOwner cannot be null.");
+            }
+
+           if(RepositoryName == null)
+            {
+                throw new ArgumentNullException("The RepositoryName cannot be null.");
+            }
+
+           if(PullRequestNumber == null)
+            {
+                throw new ArgumentNullException("The PullRequestNumber cannot be null.");
+            }
+           
+           if(MapFilePath == null)
+            {
+                throw new ArgumentNullException("The MapFilePath cannot be null.");
+            }
+
            // Call the PowerShell.Create() method to create an 
            // empty pipeline.
             PowerShell powerShell = PowerShell.Create();
