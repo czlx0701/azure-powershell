@@ -23,18 +23,43 @@ using TestMapper;
 
 namespace SmartTesterTask
 {
+    /// <summary>
+    /// A simple Microsoft Build task used to generate a list of test assemblies to be
+    /// used for testing Azure PowerShell.
+    /// </summary>
     public class SmartTestingTask : Task
     {
+        /// <summary>
+        /// Gets or sets the Repository owner of a GitHub repository.
+        /// </summary>
         [Required]
         public string RepositoryOwner { get; set; }
+        /// <summary>
+        /// Gets or sets the Repository name of a GitHub repository.
+        /// </summary>
         [Required]
         public string RepositoryName { get; set; }
+        /// <summary>
+        /// Gets or set the PullRequestNumber of a GitHub Pull Request.
+        /// </summary>
         [Required]
         public string PullRequestNumber { get; set; }
+        /// <summary>
+        ///  Gets or sets the path to the files-to-test-assemblies map.
+        /// </summary>
         [Required]
         public string MapFilePath { get; set; }
+        /// <summary>
+        /// Gets or sets the test assemblies output produced by the task.
+        /// </summary>
         [Output]
         public string[] TestAssemblies { get; set; }
+        /// <summary>
+        /// Executes the task to generate a list of test assemblies 
+        /// based on file changes from a specified Pull Request.
+        /// The output it produces is said list.
+        /// </summary>
+        /// <returns> Returns a value indicating wheter the success status of the task. </returns>
         public override bool Execute()
         {
            // Call the PowerShell.Create() method to create an 
