@@ -157,33 +157,42 @@
 #&gt;
 
 
-function New-RichException{
-Param(
-[Parameter(Mandatory=$True)]
-[object]$ErrorObject
-)
-    $code = $_.Exception.Response.StatusCode.Value__
-    $message = ""
-    if ($code -ge 400 -and $code -le 499){            
-        $message =  "Request to GitHub Api failed. List of commits could not be returned. "+
-                    "One or multiple parameters are incorrect."
-    } else {
-        $message = "The server returned an error. List of commits could not bet returned. "
+function Invoke-SafeWebRequest{
+    Param(
+    [Parameter(Mandatory=$True)]
+    [string]$Query
+    )
+    try
+    {
+        $jsonResult = Invoke-WebRequest $Query -ErrorAction Stop  
     }
-    return New-Object -TypeName System.Exception -ArgumentList $message, $_.Exception
+    catch
+    {
+        $code = $_.Exception.Response.StatusCode.Value__
+        $message = ""
+        if ($code -ge 400 -and $code -le 499){            
+            $message =  "Request to GitHub Api failed. List of commits could not be returned. "+
+                        "One or multiple parameters are incorrect."
+        } else {
+            $message = "The server returned an error. List of commits could not bet returned. "
+        }
+        $exception = New-Object -TypeName System.Exception -ArgumentList $message, $_.Exception
+        throw $exception
+    }
+
+    return $jsonResult
 }
 
 function Get-PullRequestFileChanges{
-
-[CmdletBinding()]
-Param(
-[Parameter(Mandatory=$True)]
-[string]$RepositoryOwner,
-[Parameter(Mandatory=$True)]
-[string]$RepositoryName,
-[Parameter(Mandatory=$True)]
-[int]$PullRequestNumber
-)
+    [CmdletBinding()]
+    Param(
+    [Parameter(Mandatory=$True)]
+    [string]$RepositoryOwner,
+    [Parameter(Mandatory=$True)]
+    [string]$RepositoryName,
+    [Parameter(Mandatory=$True)]
+    [int]$PullRequestNumber
+    )
 PROCESS {  
  
     $filesChanged = New-Object 'System.Collections.Generic.HashSet[string]'
@@ -197,15 +206,8 @@ PROCESS {
     {
         $currentPage += 1
         $query = "https://api.github.com/repos/$RepositoryOwner/$RepositoryName/pulls/$PullRequestNumber/files?page=$currentPage&amp;per_page=100"
-    
-        try
-        {
-            $jsonResult = Invoke-WebRequest $query
-        }
-        catch
-        {        
-            throw New-RichException($_)
-        }
+                 
+        $jsonResult = Invoke-SafeWebRequest $query   
 
         $files = ConvertFrom-Json -InputObject $jsonResult.Content
 
