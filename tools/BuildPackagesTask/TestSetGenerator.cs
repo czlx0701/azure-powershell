@@ -58,7 +58,6 @@ namespace TestMapper
 
             return TestSetGenerator.GetTestSet(paths, pathToTestsMappings);
         }
-
         /// <summary>
         /// Static method used to generate a set of tests to be run based on
         /// a set of paths
@@ -84,7 +83,6 @@ namespace TestMapper
             {
                 throw new ArgumentNullException("Paths set should never be null.");
             }
-
 
             HashSet<string> testSet = new HashSet<string>();
             //pathsProvided and pathsFound variables are used to identify if any path provided 
@@ -132,7 +130,33 @@ namespace TestMapper
             }
 
             return testSet;
+        }
 
+        public static IEnumerable<string> GetTests(string mapFilePath)
+        {
+            HashSet<string> tests = new HashSet<string>();
+
+            if (mapFilePath == null)
+            {
+                throw new ArgumentNullException("The filepath of the map should never be null.");
+            }
+
+            Dictionary<string, string[]> pathToTestsMappings;
+            try
+            {
+                pathToTestsMappings = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(File.ReadAllText(mapFilePath));
+            }
+            catch (FileNotFoundException)
+            {
+                throw new FileNotFoundException("The filepath provided for the map could not be found. Please provide a valid filepath.");
+            }
+
+            foreach (KeyValuePair<string, string[]> entry in pathToTestsMappings)
+            {
+                tests.UnionWith(entry.Value);
+            }
+
+            return tests;
         }
     }
 }

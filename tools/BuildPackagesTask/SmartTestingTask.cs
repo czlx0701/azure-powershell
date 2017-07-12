@@ -43,7 +43,6 @@ namespace SmartTesterTask
         /// <summary>
         /// Gets or set the PullRequestNumber of a GitHub Pull Request.
         /// </summary>
-        [Required]
         public string PullRequestNumber { get; set; }
         /// <summary>
         ///  Gets or sets the path to the files-to-test-assemblies map.
@@ -63,7 +62,7 @@ namespace SmartTesterTask
         /// <returns> Returns a value indicating wheter the success status of the task. </returns>
         public override bool Execute()
         {
-
+            int ParsedPullRequestNumber = 0;
            // validate parameters
            if(RepositoryOwner == null)
             {
@@ -74,40 +73,43 @@ namespace SmartTesterTask
             {
                 throw new ArgumentNullException("The RepositoryName cannot be null.");
             }
-
-           if(PullRequestNumber == null)
-            {
-                throw new ArgumentNullException("The PullRequestNumber cannot be null.");
-            }
            
            if(MapFilePath == null)
             {
                 throw new ArgumentNullException("The MapFilePath cannot be null.");
             }
-
-           // Call the PowerShell.Create() method to create an 
-           // empty pipeline.
-            PowerShell powerShell = PowerShell.Create();
-
-            powerShell.AddScript(Resources.GetFilesScript);
-            powerShell.AddScript($"Get-PullRequestFileChanges -RepositoryOwner {RepositoryOwner} " +
-                                         $"-RepositoryName {RepositoryName} -PullRequestNumber {PullRequestNumber}");
-
-            // invoke execution on the pipeline (collecting output)
-            Collection<PSObject> psOutput = powerShell.Invoke();
-            List<string> filesChanged = new List<string>();
-
-            if (psOutput == null)
+           // The next statement will convert the string representation of a number to its integer equivalent.
+           // If it succeeds it will return 'true'. 
+           if(int.TryParse(PullRequestNumber, out ParsedPullRequestNumber))
             {
-                return false;
-            }
+                // Call the PowerShell.Create() method to create an 
+                // empty pipeline.
+                PowerShell powerShell = PowerShell.Create();
 
-            foreach (var element in psOutput)
-            {
-                filesChanged.Add(element.ToString());
-            }
+                powerShell.AddScript(Resources.GetFilesScript);
+                powerShell.AddScript($"Get-PullRequestFileChanges -RepositoryOwner {RepositoryOwner} " +
+                                             $"-RepositoryName {RepositoryName} -PullRequestNumber {ParsedPullRequestNumber}");
 
-            TestAssemblies = new List<string>(TestSetGenerator.GetTests(filesChanged, MapFilePath)).ToArray();
+                // invoke execution on the pipeline (collecting output)
+                Collection<PSObject> psOutput = powerShell.Invoke();
+                List<string> filesChanged = new List<string>();
+
+                if (psOutput == null)
+                {
+                    return false;
+                }
+
+                foreach (var element in psOutput)
+                {
+                    filesChanged.Add(element.ToString());
+                }
+
+                TestAssemblies = new List<string>(TestSetGenerator.GetTests(filesChanged, MapFilePath)).ToArray();
+            }
+            else
+            {                
+                TestAssemblies = new List<string>(TestSetGenerator.GetTests(MapFilePath)).ToArray();
+            }         
 
             return true;
         }
