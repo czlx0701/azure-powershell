@@ -139,6 +139,7 @@
     <NuGetRestoreConfigFile>$(MSBuildProjectDirectory)\restore.config</NuGetRestoreConfigFile>
     <NuGetRestoreConfigSwitch>-ConfigFile &quot;$(NuGetRestoreConfigFile)&quot;</NuGetRestoreConfigSwitch>
     <NuGetRestorePackageSetting>-PackagesDirectory $(LibraryNugetPackageFolder)</NuGetRestorePackageSetting>
+    <NuGetLocalBuildTaskPackages>-PackagesDirectory $(LibraryToolsFolder)\BuildPackagesTask\packages</NuGetLocalBuildTaskPackages>
 
     <PowerShellCommand Condition=" '$(PowerShellCommand)' == '' ">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellCommand>
   </PropertyGroup>
@@ -169,7 +170,8 @@
     <!-- Restore packages for static analysis-->
     <Exec Command="$(NuGetCommand) restore %(StaticAnalysis.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
           ContinueOnError="false" />
-  <Exec Command="$(NuGetCommand) restore %(LocalBuildTasks.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
+    <!-- Restore packages for local build tasks-->
+  <Exec Command="$(NuGetCommand) restore %(LocalBuildTasks.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetLocalBuildTaskPackages)"
           ContinueOnError="false" />
   <Exec Command="$(NuGetCommand) restore %(SetupSln.FullPath) $(NuGetRestoreConfigSwitch) $(NuGetRestorePackageSetting)"
           ContinueOnError="false" />
