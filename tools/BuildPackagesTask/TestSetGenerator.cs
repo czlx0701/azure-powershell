@@ -131,7 +131,12 @@ namespace TestMapper
 
             return testSet;
         }
-
+        /// <summary>
+        /// Static method overload used to get all test assemblies using mapping 
+        /// between paths and test dlls.
+        /// </summary>
+        /// <param name="mapFilePath"></param>
+        /// <returns>A list of test dlls.</returns>
         public static IEnumerable<string> GetTests(string mapFilePath)
         {
             HashSet<string> tests = new HashSet<string>();
